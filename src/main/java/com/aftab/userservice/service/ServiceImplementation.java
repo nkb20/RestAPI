@@ -1,14 +1,16 @@
 package com.aftab.userservice.service;
 
 import com.aftab.userservice.entities.Users;
+import com.aftab.userservice.exceptions.ResourceNotFoundException;
+import com.aftab.userservice.payload.ApiResponse;
 import com.aftab.userservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ServiceImplementation implements UserService {
@@ -30,21 +32,24 @@ public class ServiceImplementation implements UserService {
     }
 
     @Override
-    public Optional<Users> getUserById(int id) {
-        return userRepository.findById(id);
-
+    public ResponseEntity<Users> getUserById(int id) {
+        Users user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Users", "id", id));
+        return new ResponseEntity(user, HttpStatus.FOUND);
 
     }
 
     @Override
     public ResponseEntity deleteUserById(int id) {
-        if (userRepository.findById(id).isEmpty()) {
-            return new ResponseEntity("id not found", HttpStatus.NOT_FOUND);
-        } else {
-            userRepository.deleteById(id);
+        Users user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Users", "id", id));
 
-        }
-        return new ResponseEntity("Id " + id + " deleted succesfully", HttpStatus.FOUND);
-
+        userRepository.deleteById(id);
+//        if (userRepository.findById(id).isEmpty()) {
+//            return new ResourceNotFoundException("f","f",id);
+//        } else {
+//            userRepository.deleteById(id);
+//
+//        }
+//        return new ResponseEntity("Id " + id + " deleted succesfully", HttpStatus.FOUND);
+        return new ResponseEntity(new ApiResponse("Deleted Succesfully", true, LocalDate.now()), HttpStatus.ACCEPTED);
     }
 }

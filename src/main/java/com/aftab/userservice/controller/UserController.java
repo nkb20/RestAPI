@@ -1,6 +1,7 @@
 package com.aftab.userservice.controller;
 
 import com.aftab.userservice.entities.Users;
+import com.aftab.userservice.payload.EmptyUsers;
 import com.aftab.userservice.service.ServiceImplementation;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +24,10 @@ public class UserController {
 //        log.info("request Recieved");
         List<Users> user = serviceImplementation.getAllUsers();
         if (user.isEmpty()) {
-            return new ResponseEntity("Not Found", HttpStatus.NOT_FOUND);
+            return new ResponseEntity( new EmptyUsers("Empty users","Add new Users "),HttpStatus.NOT_FOUND);
 
         }
-        return new ResponseEntity(user, HttpStatus.FOUND);
+        return new ResponseEntity<>(user, HttpStatus.FOUND);
     }
 
     @PostMapping("/users")
@@ -36,13 +37,8 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}")
-        public Optional<Users> getUserById(@PathVariable int id) {
-//        Optional<Users> user = serviceImplementation.getUserById(id);
-//        if (user.isEmpty()) {
-//            return new ResponseEntity("Not Found", HttpStatus.NOT_FOUND);
-//
-//        }
-//        return new ResponseEntity(user, HttpStatus.FOUND);
+        public ResponseEntity<Users> getUserById(@PathVariable int id) {
+
         return serviceImplementation.getUserById(id);
     }
 
